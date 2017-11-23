@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -37,10 +37,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static com.example.lenovo.tmbd_safwane.R.drawable.movies;
-
-public class MovieListActivity extends AppCompatActivity {
-    private static String TAG = MovieListActivity.class.getSimpleName();
+public class MovieGridActivity extends AppCompatActivity {
+    private static String TAG = MovieGridActivity.class.getSimpleName();
 
     Context context = this;
 
@@ -58,7 +56,7 @@ public class MovieListActivity extends AppCompatActivity {
     String API_BASE = "https://api.themoviedb.org/3/";
 
     //Recycler view and Adapter
-    private MovieAdapter mAdapter;
+    private MovieAdapterGrid mAdapter;
     private RecyclerView mList;
 
 
@@ -66,11 +64,11 @@ public class MovieListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_movie_list);
+        setContentView(R.layout.activity_movie_grid);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mNavItems.add(new NavItem("Movies", "List the movies", movies));
+        mNavItems.add(new NavItem("Movies", "List the movies", R.drawable.heart01));
         mNavItems.add(new NavItem("Tv shows", "List the tv shows", R.drawable.tv_shows));
         mNavItems.add(new NavItem("Settings", "Change your settings", R.drawable.ic_settings_black_24dp));
         mNavItems.add(new NavItem("Favourites", "List your favourites", R.drawable.heart01));
@@ -110,7 +108,7 @@ public class MovieListActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_grid, menu);
         return true;
     }
 
@@ -122,10 +120,10 @@ public class MovieListActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //Show the grid view after clicking on Grid Icon
-        if (id == R.id.action_grid) {
-            Intent intentMain = new Intent(MovieListActivity.this ,
-                    MovieGridActivity.class);
-            MovieListActivity.this.startActivity(intentMain);
+        if (id == R.id.action_list) {
+            Intent intentMain = new Intent(MovieGridActivity.this ,
+                    MovieListActivity.class);
+            MovieGridActivity.this.startActivity(intentMain);
             Log.i("Content "," Main layout ");
         }
 
@@ -175,13 +173,13 @@ public class MovieListActivity extends AppCompatActivity {
 
                 mList = (RecyclerView) findViewById(R.id.rv);
 
-                LinearLayoutManager layoutManager = new LinearLayoutManager(context);
+                GridLayoutManager layoutManager = new GridLayoutManager(context, 3);
                 mList.setLayoutManager(layoutManager);
 
 
                 //String listeName[] = {"chaine1", "chaine2", "chaine3", "chaine4", "chaine5", "chaine6", "chaine7", "chaine8", "chaine9", "chaine10"};
 
-                mAdapter = new MovieAdapter(listMovies, getApplicationContext());
+                mAdapter = new MovieAdapterGrid(listMovies, getApplicationContext());
 
                 mList.setAdapter(mAdapter);
                 // TODO: use the repository list and display it
@@ -190,7 +188,7 @@ public class MovieListActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<Movies> call, Throwable t) {
                 // the network call was a failure
-                Toast.makeText(MovieListActivity.this, "It's not working", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MovieGridActivity.this, "It's not working", Toast.LENGTH_SHORT).show();
                 // TODO: handle error
             }
         });
