@@ -3,13 +3,14 @@ package com.example.lenovo.tmbd_safwane.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by Lenovo on 15/11/2017.
  */
 
-public class Movie {
+public class Movie implements Serializable {
 
         @SerializedName("vote_count")
         @Expose

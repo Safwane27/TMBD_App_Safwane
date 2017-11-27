@@ -1,6 +1,7 @@
 package com.example.lenovo.tmbd_safwane;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,10 +39,9 @@ public class MovieAdapterGrid extends RecyclerView.Adapter<MovieAdapterGrid.Cust
 
     @Override
     public void onBindViewHolder(CustomViewHolder holder, int position) {
-        //String title = mListMovie.get(position).getTitle();
-        //String overview = mListMovie.get(position).getOverview();
-        String poster = mListMovie.get(position).getPosterPath();
-        holder.bind(poster);
+        Movie movie = mListMovie.get(position);
+        String poster = movie.getPosterPath();
+        holder.bind(movie, poster);
     }
 
     @Override
@@ -52,33 +52,29 @@ public class MovieAdapterGrid extends RecyclerView.Adapter<MovieAdapterGrid.Cust
 
     class CustomViewHolder extends RecyclerView.ViewHolder {
 
-        //TextView listMovieTitle;
-        //TextView listMovieOverview;
         ImageView listMoviePoster;
 
         public CustomViewHolder(View itemView) {
             super(itemView);
-            //listMovieTitle =  itemView.findViewById(R.id.movie_title);
-            //listMovieOverview = itemView.findViewById(R.id.movie_overview);
             listMoviePoster = itemView.findViewById(R.id.movie_poster);
 
         }
 
-        void bind(final String poster) {
-            //listMovieTitle.setText(title);
-            //listMovieOverview.setText(overview);
-            //listMovieOverview.setText(poster);
+        void bind(final Movie movie, final String poster) {
             Picasso
                     .with(mContext)
                     .load("http://image.tmdb.org/t/p/w500"+poster)
                     .into(listMoviePoster);
 
-            /*listMovieTitle.setOnClickListener(new View.OnClickListener() {
+            itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(mContext, "You clicked on : " + title, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(mContext, "You clicked on : " + title, Toast.LENGTH_SHORT).show();
+                    Intent detailsIntent = new Intent(mContext, MovieActivity.class);
+                    detailsIntent.putExtra("movie", movie);
+                    mContext.startActivity(detailsIntent);
                 }
-            });*/
+            });
         }
     }
 }

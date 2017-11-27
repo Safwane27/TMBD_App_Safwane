@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.lenovo.tmbd_safwane.models.Movie;
+import com.example.lenovo.tmbd_safwane.models.Serie;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -19,13 +19,13 @@ import java.util.List;
  * Created by Lenovo on 21/11/2017.
  */
 
-public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.CustomViewHolder> {
+public class SerieAdapter extends RecyclerView.Adapter<SerieAdapter.CustomViewHolder> {
 
-    private List<Movie> mListMovie = new ArrayList<>();
+    private List<Serie> mListSerie = new ArrayList<>();
     private Context mContext;
 
-    public MovieAdapter(List<Movie> listMovie, Context context) {
-        mListMovie = listMovie;
+    public SerieAdapter(List<Serie> listSerie, Context context) {
+        mListSerie = listSerie;
         mContext = context;
     }
 
@@ -40,49 +40,49 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.CustomViewHo
 
     @Override
     public void onBindViewHolder(CustomViewHolder holder, int position) {
-        Movie movie = mListMovie.get(position);
-        String title = movie.getTitle();
-        String overview = movie.getOverview();
-        String poster = movie.getPosterPath();
-        holder.bind(movie, title, overview, poster);
+        Serie serie = mListSerie.get(position);
+        String title = serie.getName();
+        String overview = serie.getOverview();
+        String poster = serie.getPosterPath();
+        holder.bind(serie, title, overview, poster);
     }
 
     @Override
     public int getItemCount() {
-        return mListMovie.size();
+        return mListSerie.size();
     }
 
 
     class CustomViewHolder extends RecyclerView.ViewHolder {
 
-        TextView listMovieTitle;
-        TextView listMovieOverview;
-        ImageView listMoviePoster;
+        TextView listSerieTitle;
+        TextView listSerieOverview;
+        ImageView listSeriePoster;
 
         public CustomViewHolder(View itemView) {
             super(itemView);
-            listMovieTitle =  itemView.findViewById(R.id.movie_title);
-            listMovieOverview = itemView.findViewById(R.id.movie_overview);
-            listMoviePoster = itemView.findViewById(R.id.movie_poster);
+            listSerieTitle =  itemView.findViewById(R.id.movie_title);
+            listSerieOverview = itemView.findViewById(R.id.movie_overview);
+            listSeriePoster = itemView.findViewById(R.id.movie_poster);
 
         }
 
-        void bind(final Movie movie, final String title, final String overview, final String poster) {
+        void bind(final Serie serie, final String title, final String overview, final String poster) {
 
-            listMovieTitle.setText(title);
-            listMovieOverview.setText(overview);
-            //listMovieOverview.setText(poster);
+            listSerieTitle.setText(title);
+            listSerieOverview.setText(overview);
+            //listSerieOverview.setText(poster);
             Picasso
                     .with(mContext)
                     .load("http://image.tmdb.org/t/p/w500"+poster)
-                    .into(listMoviePoster);
+                    .into(listSeriePoster);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     //Toast.makeText(mContext, "You clicked on : " + title, Toast.LENGTH_SHORT).show();
-                    Intent detailsIntent = new Intent(mContext, MovieActivity.class);
-                    detailsIntent.putExtra("movie", movie);
+                    Intent detailsIntent = new Intent(mContext, SerieActivity.class);
+                    detailsIntent.putExtra("serie", serie);
                     mContext.startActivity(detailsIntent);
                 }
             });

@@ -23,8 +23,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.lenovo.tmbd_safwane.models.Movie;
-import com.example.lenovo.tmbd_safwane.models.Movies;
+import com.example.lenovo.tmbd_safwane.models.Serie;
+import com.example.lenovo.tmbd_safwane.models.Series;
 import com.example.lenovo.tmbd_safwane.service.ApiService;
 
 import java.io.IOException;
@@ -37,8 +37,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MovieGridActivity extends AppCompatActivity {
-    private static String TAG = MovieGridActivity.class.getSimpleName();
+public class SerieGridActivity extends AppCompatActivity {
+    private static String TAG = SerieGridActivity.class.getSimpleName();
 
     Context context = this;
 
@@ -56,7 +56,7 @@ public class MovieGridActivity extends AppCompatActivity {
     String API_BASE = "https://api.themoviedb.org/3/";
 
     //Recycler view and Adapter
-    private MovieAdapterGrid mAdapter;
+    private SerieAdapterGrid mAdapter;
     private RecyclerView mList;
 
 
@@ -94,15 +94,15 @@ public class MovieGridActivity extends AppCompatActivity {
                 setTitle(mNavItems.get(position).mTitle);
                 Toast.makeText(mContext, "You clicked on " + mNavItems.get(position).mTitle, Toast.LENGTH_SHORT).show();
                 if(mNavItems.get(position).mTitle == "Movies"){
-                    Intent intentMain = new Intent(MovieGridActivity.this ,
+                    Intent intentMain = new Intent(SerieGridActivity.this ,
                             MovieListActivity.class);
-                    MovieGridActivity.this.startActivity(intentMain);
+                    SerieGridActivity.this.startActivity(intentMain);
                     Log.i("Content "," Main layout ");
                 }
                 if(mNavItems.get(position).mTitle == "Tv shows"){
-                    Intent intentMain = new Intent(MovieGridActivity.this ,
+                    Intent intentMain = new Intent(SerieGridActivity.this ,
                             SerieListActivity.class);
-                    MovieGridActivity.this.startActivity(intentMain);
+                    SerieGridActivity.this.startActivity(intentMain);
                     Log.i("Content "," Main layout ");
                 }
             }
@@ -133,9 +133,9 @@ public class MovieGridActivity extends AppCompatActivity {
 
         //Show the grid view after clicking on Grid Icon
         if (id == R.id.action_list) {
-            Intent intentMain = new Intent(MovieGridActivity.this ,
-                    MovieListActivity.class);
-            MovieGridActivity.this.startActivity(intentMain);
+            Intent intentMain = new Intent(SerieGridActivity.this ,
+                    SerieListActivity.class);
+            SerieGridActivity.this.startActivity(intentMain);
             Log.i("Content "," Main layout ");
         }
 
@@ -145,7 +145,7 @@ public class MovieGridActivity extends AppCompatActivity {
 
 
     public void retrofitMethod() throws IOException {
-        final List<Movie> listMovies = new ArrayList<>();
+        final List<Serie> listSeries = new ArrayList<>();
 
         Retrofit restAdapter =
                 new Retrofit.Builder()
@@ -158,22 +158,19 @@ public class MovieGridActivity extends AppCompatActivity {
         // Create a very simple REST adapter which points TMDB API endpoint.
         ApiService apiservice =  restAdapter.create(ApiService.class);
 
-        // Fetch a list of the popular movies.
-        //Call<List<Movie>> call = apiservice.getPopularMovies(API_KEY);
-
         // Execute the call asynchronously. Get a positive or negative callback.
-        apiservice.getPopularMovies(API_KEY).enqueue(new Callback<Movies>() {
+        apiservice.getPopularSeries(API_KEY).enqueue(new Callback<Series>() {
             @Override
-            public void onResponse(Call<Movies> call, Response<Movies> response) {
+            public void onResponse(Call<Series> call, Response<Series> response) {
                 // The network call was a success and we got a response
 
                 //Toast.makeText(MovieListActivity.this, "It's working", Toast.LENGTH_SHORT).show();
                 int i=0;
-                Movies movies = response.body();
-                if (movies != null) {
-                    for (Movie movie : movies.getResults()) {
-                        if (movie.getTitle() != null){// && movie.getPosterPath() != null) {
-                            listMovies.add(movie);
+                Series series = response.body();
+                if (series != null) {
+                    for (Serie serie : series.getResults()) {
+                        if (serie.getName() != null){// && movie.getPosterPath() != null) {
+                            listSeries.add(serie);
                             i++;
                         }
                     }
@@ -188,19 +185,16 @@ public class MovieGridActivity extends AppCompatActivity {
                 GridLayoutManager layoutManager = new GridLayoutManager(context, 3);
                 mList.setLayoutManager(layoutManager);
 
-
-                //String listeName[] = {"chaine1", "chaine2", "chaine3", "chaine4", "chaine5", "chaine6", "chaine7", "chaine8", "chaine9", "chaine10"};
-
-                mAdapter = new MovieAdapterGrid(listMovies, getApplicationContext());
+                mAdapter = new SerieAdapterGrid(listSeries, getApplicationContext());
 
                 mList.setAdapter(mAdapter);
                 // TODO: use the repository list and display it
             }
 
             @Override
-            public void onFailure(Call<Movies> call, Throwable t) {
+            public void onFailure(Call<Series> call, Throwable t) {
                 // the network call was a failure
-                Toast.makeText(MovieGridActivity.this, "It's not working", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SerieGridActivity.this, "It's not working", Toast.LENGTH_SHORT).show();
                 // TODO: handle error
             }
         });

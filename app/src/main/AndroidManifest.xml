@@ -20,6 +20,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".MovieGridActivity" ></activity>
+        <activity android:name=".MovieActivity" ></activity>
+        <activity android:name=".SerieListActivity" ></activity>
+        <activity android:name=".SerieGridActivity" ></activity>
+        <activity android:name=".SerieActivity" ></activity>
     </application>
 
 </manifest>

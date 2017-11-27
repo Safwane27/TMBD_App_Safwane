@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -23,8 +23,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.lenovo.tmbd_safwane.models.Movie;
-import com.example.lenovo.tmbd_safwane.models.Movies;
+import com.example.lenovo.tmbd_safwane.models.Serie;
+import com.example.lenovo.tmbd_safwane.models.Series;
 import com.example.lenovo.tmbd_safwane.service.ApiService;
 
 import java.io.IOException;
@@ -37,8 +37,10 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MovieGridActivity extends AppCompatActivity {
-    private static String TAG = MovieGridActivity.class.getSimpleName();
+import static com.example.lenovo.tmbd_safwane.R.drawable.movies;
+
+public class SerieListActivity extends AppCompatActivity {
+    private static String TAG = SerieListActivity.class.getSimpleName();
 
     Context context = this;
 
@@ -56,7 +58,7 @@ public class MovieGridActivity extends AppCompatActivity {
     String API_BASE = "https://api.themoviedb.org/3/";
 
     //Recycler view and Adapter
-    private MovieAdapterGrid mAdapter;
+    private SerieAdapter mAdapter;
     private RecyclerView mList;
 
 
@@ -64,11 +66,11 @@ public class MovieGridActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_movie_grid);
+        setContentView(R.layout.activity_movie_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mNavItems.add(new NavItem("Movies", "List the movies", R.drawable.heart01));
+        mNavItems.add(new NavItem("Movies", "List the movies", movies));
         mNavItems.add(new NavItem("Tv shows", "List the tv shows", R.drawable.tv_shows));
         mNavItems.add(new NavItem("Settings", "Change your settings", R.drawable.ic_settings_black_24dp));
         mNavItems.add(new NavItem("Favourites", "List your favourites", R.drawable.heart01));
@@ -94,15 +96,15 @@ public class MovieGridActivity extends AppCompatActivity {
                 setTitle(mNavItems.get(position).mTitle);
                 Toast.makeText(mContext, "You clicked on " + mNavItems.get(position).mTitle, Toast.LENGTH_SHORT).show();
                 if(mNavItems.get(position).mTitle == "Movies"){
-                    Intent intentMain = new Intent(MovieGridActivity.this ,
+                    Intent intentMain = new Intent(SerieListActivity.this ,
                             MovieListActivity.class);
-                    MovieGridActivity.this.startActivity(intentMain);
+                    SerieListActivity.this.startActivity(intentMain);
                     Log.i("Content "," Main layout ");
                 }
                 if(mNavItems.get(position).mTitle == "Tv shows"){
-                    Intent intentMain = new Intent(MovieGridActivity.this ,
+                    Intent intentMain = new Intent(SerieListActivity.this ,
                             SerieListActivity.class);
-                    MovieGridActivity.this.startActivity(intentMain);
+                    SerieListActivity.this.startActivity(intentMain);
                     Log.i("Content "," Main layout ");
                 }
             }
@@ -120,7 +122,7 @@ public class MovieGridActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_grid, menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -132,10 +134,10 @@ public class MovieGridActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //Show the grid view after clicking on Grid Icon
-        if (id == R.id.action_list) {
-            Intent intentMain = new Intent(MovieGridActivity.this ,
-                    MovieListActivity.class);
-            MovieGridActivity.this.startActivity(intentMain);
+        if (id == R.id.action_grid) {
+            Intent intentMain = new Intent(SerieListActivity.this ,
+                    SerieGridActivity.class);
+            SerieListActivity.this.startActivity(intentMain);
             Log.i("Content "," Main layout ");
         }
 
@@ -145,7 +147,7 @@ public class MovieGridActivity extends AppCompatActivity {
 
 
     public void retrofitMethod() throws IOException {
-        final List<Movie> listMovies = new ArrayList<>();
+        final List<Serie> listSeries = new ArrayList<>();
 
         Retrofit restAdapter =
                 new Retrofit.Builder()
@@ -158,22 +160,19 @@ public class MovieGridActivity extends AppCompatActivity {
         // Create a very simple REST adapter which points TMDB API endpoint.
         ApiService apiservice =  restAdapter.create(ApiService.class);
 
-        // Fetch a list of the popular movies.
-        //Call<List<Movie>> call = apiservice.getPopularMovies(API_KEY);
-
         // Execute the call asynchronously. Get a positive or negative callback.
-        apiservice.getPopularMovies(API_KEY).enqueue(new Callback<Movies>() {
+        apiservice.getPopularSeries(API_KEY).enqueue(new Callback<Series>() {
             @Override
-            public void onResponse(Call<Movies> call, Response<Movies> response) {
+            public void onResponse(Call<Series> call, Response<Series> response) {
                 // The network call was a success and we got a response
 
                 //Toast.makeText(MovieListActivity.this, "It's working", Toast.LENGTH_SHORT).show();
                 int i=0;
-                Movies movies = response.body();
-                if (movies != null) {
-                    for (Movie movie : movies.getResults()) {
-                        if (movie.getTitle() != null){// && movie.getPosterPath() != null) {
-                            listMovies.add(movie);
+                Series series = response.body();
+                if (series != null) {
+                    for (Serie serie : series.getResults()) {
+                        if (serie.getName() != null){// && movie.getPosterPath() != null) {
+                            listSeries.add(serie);
                             i++;
                         }
                     }
@@ -185,22 +184,19 @@ public class MovieGridActivity extends AppCompatActivity {
 
                 mList = (RecyclerView) findViewById(R.id.rv);
 
-                GridLayoutManager layoutManager = new GridLayoutManager(context, 3);
+                LinearLayoutManager layoutManager = new LinearLayoutManager(context);
                 mList.setLayoutManager(layoutManager);
 
-
-                //String listeName[] = {"chaine1", "chaine2", "chaine3", "chaine4", "chaine5", "chaine6", "chaine7", "chaine8", "chaine9", "chaine10"};
-
-                mAdapter = new MovieAdapterGrid(listMovies, getApplicationContext());
+                mAdapter = new SerieAdapter(listSeries, getApplicationContext());
 
                 mList.setAdapter(mAdapter);
                 // TODO: use the repository list and display it
             }
 
             @Override
-            public void onFailure(Call<Movies> call, Throwable t) {
+            public void onFailure(Call<Series> call, Throwable t) {
                 // the network call was a failure
-                Toast.makeText(MovieGridActivity.this, "It's not working", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SerieListActivity.this, "It's not working", Toast.LENGTH_SHORT).show();
                 // TODO: handle error
             }
         });

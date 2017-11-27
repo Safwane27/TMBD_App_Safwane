@@ -95,6 +95,18 @@ public class MovieListActivity extends AppCompatActivity {
                  */
                 setTitle(mNavItems.get(position).mTitle);
                 Toast.makeText(mContext, "You clicked on " + mNavItems.get(position).mTitle, Toast.LENGTH_SHORT).show();
+                if(mNavItems.get(position).mTitle == "Movies"){
+                    Intent intentMain = new Intent(MovieListActivity.this ,
+                            MovieListActivity.class);
+                    MovieListActivity.this.startActivity(intentMain);
+                    Log.i("Content "," Main layout ");
+                }
+                if(mNavItems.get(position).mTitle == "Tv shows"){
+                    Intent intentMain = new Intent(MovieListActivity.this ,
+                            SerieListActivity.class);
+                    MovieListActivity.this.startActivity(intentMain);
+                    Log.i("Content "," Main layout ");
+                }
             }
         });
 
@@ -148,9 +160,6 @@ public class MovieListActivity extends AppCompatActivity {
         // Create a very simple REST adapter which points TMDB API endpoint.
         ApiService apiservice =  restAdapter.create(ApiService.class);
 
-        // Fetch a list of the popular movies.
-        //Call<List<Movie>> call = apiservice.getPopularMovies(API_KEY);
-
         // Execute the call asynchronously. Get a positive or negative callback.
         apiservice.getPopularMovies(API_KEY).enqueue(new Callback<Movies>() {
             @Override
@@ -177,9 +186,6 @@ public class MovieListActivity extends AppCompatActivity {
 
                 LinearLayoutManager layoutManager = new LinearLayoutManager(context);
                 mList.setLayoutManager(layoutManager);
-
-
-                //String listeName[] = {"chaine1", "chaine2", "chaine3", "chaine4", "chaine5", "chaine6", "chaine7", "chaine8", "chaine9", "chaine10"};
 
                 mAdapter = new MovieAdapter(listMovies, getApplicationContext());
 
