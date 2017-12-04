@@ -194,7 +194,7 @@ public class SerieGridActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<Series> call, Throwable t) {
                 // the network call was a failure
-                Toast.makeText(SerieGridActivity.this, "It's not working", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SerieGridActivity.this, "Could not retrieve data, check connection", Toast.LENGTH_SHORT).show();
                 // TODO: handle error
             }
         });

@@ -15,7 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -44,22 +46,51 @@ public class MovieActivity extends AppCompatActivity {
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
 
+    private DBHelper db;
+
+    private RelativeLayout addFavLayout;
+    private ImageButton addFavButton;
+
     ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
 
     private Movie movie;
+
+    private LinearLayout linearLayout;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie);
+        //getLayoutInflater().inflate(R.layout.activity_movie, null);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar2);
         setSupportActionBar(toolbar);
+
+        //getLayoutInflater().inflate(R.layout.activity_movie, linearLayout);
+        //View v = getLayoutInflater().inflate(R.layout.activity_movie, null);
+        addFavButton =  (ImageButton)findViewById(R.id.favorite_border);
+        addFavButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                //boolean inserted = db.insert(movie.getId(), movie.getTitle(), movie.getOverview(), movie.getPosterPath(),   movie.getVoteAverage());
+                //if(inserted) {
+                Toast.makeText(mContext, "Added to favorites", Toast.LENGTH_LONG);
+                //}else{
+                Toast.makeText(mContext, "Error adding to favourites", Toast.LENGTH_LONG);
+                //}
+                Toast.makeText(mContext, "Added to favorites", Toast.LENGTH_LONG);
+                Toast.makeText(mContext, "Error adding to favourites", Toast.LENGTH_LONG);
+                setTitle("Movie details");
+            }
+        });
+
 
         mNavItems.add(new NavItem("Movies", "List the movies", movies));
         mNavItems.add(new NavItem("Tv shows", "List the tv shows", R.drawable.tv_shows));
         mNavItems.add(new NavItem("Settings", "Change your settings", R.drawable.ic_settings_black_24dp));
         mNavItems.add(new NavItem("Favourites", "List your favourites", R.drawable.heart01));
+
+
 
         // DrawerLayout
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -93,6 +124,12 @@ public class MovieActivity extends AppCompatActivity {
                     MovieActivity.this.startActivity(intentMain);
                     Log.i("Content "," Serie layout ");
                 }
+                if(mNavItems.get(position).mTitle == "Favourites"){
+                    Intent intentMain = new Intent(MovieActivity.this ,
+                            FavouriteListActivity.class);
+                    MovieActivity.this.startActivity(intentMain);
+                    Log.i("Content "," Main layout ");
+                }
             }
         });
 
@@ -113,6 +150,16 @@ public class MovieActivity extends AppCompatActivity {
                 .load("http://image.tmdb.org/t/p/w500"+movie.getBackdropPath())
                 .into(poster);
 
+
+
+    }
+
+
+    /**
+     * TODO FONCTION ON CLICK NOT WORKING
+     */
+    public void addFav(){
+        setTitle("Button working");
     }
 
     @Override

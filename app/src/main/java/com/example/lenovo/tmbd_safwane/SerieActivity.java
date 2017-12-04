@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -52,9 +53,12 @@ public class SerieActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_movie);
+        //setContentView(R.layout.activity_movie);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar2);
         setSupportActionBar(toolbar);
+
+        ImageButton addFavButton =  (ImageButton)findViewById(R.id.favorite_border);
+        setTitle("Movie details");
 
         mNavItems.add(new NavItem("Movies", "List the movies", movies));
         mNavItems.add(new NavItem("Tv shows", "List the tv shows", R.drawable.tv_shows));
@@ -112,6 +116,20 @@ public class SerieActivity extends AppCompatActivity {
                 .with(context)
                 .load("http://image.tmdb.org/t/p/w500"+serie.getBackdropPath())
                 .into(poster);
+
+        addFavButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                //boolean inserted = db.insert(movie.getId(), movie.getTitle(), movie.getOverview(), movie.getPosterPath(),   movie.getVoteAverage());
+                //if(inserted) {
+                Toast.makeText(mContext, "Added to favorites", Toast.LENGTH_LONG);
+                //}else{
+                Toast.makeText(mContext, "Error adding to favourites", Toast.LENGTH_LONG);
+                //}
+                Toast.makeText(mContext, "Added to favorites", Toast.LENGTH_LONG);
+                Toast.makeText(mContext, "Error adding to favourites", Toast.LENGTH_LONG);
+            }
+        });
 
     }
 

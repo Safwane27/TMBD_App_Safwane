@@ -2,6 +2,7 @@ package com.example.lenovo.tmbd_safwane;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -24,23 +25,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.lenovo.tmbd_safwane.models.Movie;
-import com.example.lenovo.tmbd_safwane.models.Movies;
-import com.example.lenovo.tmbd_safwane.service.ApiService;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
 import static com.example.lenovo.tmbd_safwane.R.drawable.movies;
+import static com.example.lenovo.tmbd_safwane.R.id.rv;
 
-public class MovieListActivity extends AppCompatActivity {
-    private static String TAG = MovieListActivity.class.getSimpleName();
+public class FavouriteListActivity extends AppCompatActivity {
+    private static String TAG = FavouriteListActivity.class.getSimpleName();
 
     Context context = this;
 
@@ -61,6 +54,8 @@ public class MovieListActivity extends AppCompatActivity {
     private String layout = "List";
     private MovieAdapter mAdapter;
     private RecyclerView mList;
+
+    private DBHelper db;
 
 
 
@@ -97,31 +92,44 @@ public class MovieListActivity extends AppCompatActivity {
                 setTitle(mNavItems.get(position).mTitle);
                 Toast.makeText(mContext, "You clicked on " + mNavItems.get(position).mTitle, Toast.LENGTH_SHORT).show();
                 if(mNavItems.get(position).mTitle == "Movies"){
-                    Intent intentMain = new Intent(MovieListActivity.this ,
-                            MovieListActivity.class);
-                    MovieListActivity.this.startActivity(intentMain);
+                    Intent intentMain = new Intent(FavouriteListActivity.this ,
+                            FavouriteListActivity.class);
+                    FavouriteListActivity.this.startActivity(intentMain);
                     Log.i("Content "," Main layout ");
                 }
                 if(mNavItems.get(position).mTitle == "Tv shows"){
-                    Intent intentMain = new Intent(MovieListActivity.this ,
+                    Intent intentMain = new Intent(FavouriteListActivity.this ,
                             SerieListActivity.class);
-                    MovieListActivity.this.startActivity(intentMain);
-                    Log.i("Content "," Main layout ");
-                }
-                if(mNavItems.get(position).mTitle == "Favourites"){
-                    Intent intentMain = new Intent(MovieListActivity.this ,
-                            FavouriteListActivity.class);
-                    MovieListActivity.this.startActivity(intentMain);
+                    FavouriteListActivity.this.startActivity(intentMain);
                     Log.i("Content "," Main layout ");
                 }
             }
         });
 
-        try {
-            retrofitMethod();
-        } catch (IOException e) {
-            e.printStackTrace();
+        db = new DBHelper(this);
+        Cursor res = db.getFavoriteList();
+        mList = (RecyclerView) findViewById(rv);
+        final List<Movie> listMovies = new ArrayList<>();
+
+
+        while (res.moveToNext()) {
+            Log.v("movie", res.getString(0) + " " + res.getString(1));
+            Movie m = new Movie();
+            m.setId(res.getInt(0));
+            m.setTitle(res.getString(1));
+            m.setOverview(res.getString(0));
+            m.setPosterPath(res.getString(0));
+            m.setVoteAverage(res.getDouble(0));
+
+            listMovies.add(m);
         }
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(context);
+        mList.setLayoutManager(layoutManager);
+
+        mAdapter = new MovieAdapter(listMovies, getApplicationContext());
+
+        mList.setAdapter(mAdapter);
 
 
     }
@@ -142,9 +150,9 @@ public class MovieListActivity extends AppCompatActivity {
 
         //Show the grid view after clicking on Grid Icon
         if (id == R.id.action_grid) {
-            Intent intentMain = new Intent(MovieListActivity.this ,
+            Intent intentMain = new Intent(FavouriteListActivity.this ,
                     MovieGridActivity.class);
-            MovieListActivity.this.startActivity(intentMain);
+            FavouriteListActivity.this.startActivity(intentMain);
             Log.i("Content "," Main layout ");
         }
 
@@ -153,61 +161,6 @@ public class MovieListActivity extends AppCompatActivity {
 
 
 
-    public void retrofitMethod() throws IOException {
-        final List<Movie> listMovies = new ArrayList<>();
-
-        Retrofit restAdapter =
-                new Retrofit.Builder()
-                        .baseUrl(API_BASE)
-                        .addConverterFactory(
-                                GsonConverterFactory.create()
-                        ).build();
-
-
-        // Create a very simple REST adapter which points TMDB API endpoint.
-        ApiService apiservice =  restAdapter.create(ApiService.class);
-
-        // Execute the call asynchronously. Get a positive or negative callback.
-        apiservice.getPopularMovies(API_KEY).enqueue(new Callback<Movies>() {
-            @Override
-            public void onResponse(Call<Movies> call, Response<Movies> response) {
-                // The network call was a success and we got a response
-
-                //Toast.makeText(MovieListActivity.this, "It's working", Toast.LENGTH_SHORT).show();
-                int i=0;
-                Movies movies = response.body();
-                if (movies != null) {
-                    for (Movie movie : movies.getResults()) {
-                        if (movie.getTitle() != null){// && movie.getPosterPath() != null) {
-                            listMovies.add(movie);
-                            i++;
-                        }
-                    }
-                }
-
-                /**
-                 * Add the list we get to our recyler view
-                 */
-
-                mList = (RecyclerView) findViewById(R.id.rv);
-
-                LinearLayoutManager layoutManager = new LinearLayoutManager(context);
-                mList.setLayoutManager(layoutManager);
-
-                mAdapter = new MovieAdapter(listMovies, getApplicationContext());
-
-                mList.setAdapter(mAdapter);
-                // TODO: use the repository list and display it
-            }
-
-            @Override
-            public void onFailure(Call<Movies> call, Throwable t) {
-                // the network call was a failure
-                Toast.makeText(MovieListActivity.this, "Could not retrieve data, check connection", Toast.LENGTH_SHORT).show();
-                // TODO: handle error
-            }
-        });
-    }
 
 
     class NavItem {
