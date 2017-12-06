@@ -105,12 +105,12 @@ public class DBHelper  extends SQLiteOpenHelper {
     }
     */
 
-    public void delete(int favorite_id) {
+    public Integer delete(int favorite_id) {
 
         SQLiteDatabase db = this.getWritableDatabase();
         // It's a good practice to use parameter ?, instead of concatenate string
-        db.delete(Favorite.TABLE, Favorite.KEY_ID + "= ?", new String[] { String.valueOf(favorite_id) });
-        db.close(); // Closing database connection
+        return db.delete(Favorite.TABLE, Favorite.KEY_ID + "= ?", new String[] { String.valueOf(favorite_id) });
+        //db.close(); // Closing database connection
     }
 
 

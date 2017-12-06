@@ -71,7 +71,6 @@ public class SerieAdapter extends RecyclerView.Adapter<SerieAdapter.CustomViewHo
 
             listSerieTitle.setText(title);
             listSerieOverview.setText(overview);
-            //listSerieOverview.setText(poster);
             Picasso
                     .with(mContext)
                     .load("http://image.tmdb.org/t/p/w500"+poster)

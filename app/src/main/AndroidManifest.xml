@@ -19,12 +19,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MovieGridActivity" ></activity>
-        <activity android:name=".MovieActivity" ></activity>
-        <activity android:name=".SerieListActivity" ></activity>
-        <activity android:name=".FavouriteListActivity" ></activity>
-        <activity android:name=".SerieGridActivity" ></activity>
-        <activity android:name=".SerieActivity" ></activity>
+        <activity android:name=".MovieGridActivity" />
+        <activity android:name=".MovieActivity" />
+        <activity android:name=".SerieListActivity" />
+        <activity android:name=".FavouriteListActivity" />
+        <activity android:name=".SerieGridActivity" />
+        <activity android:name=".SerieActivity" />
+        <activity android:name=".SettingsActivity"></activity>
     </application>
 
 </manifest>

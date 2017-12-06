@@ -2,6 +2,7 @@ package com.example.lenovo.tmbd_safwane;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -59,7 +60,7 @@ public class SerieGridActivity extends AppCompatActivity {
     private SerieAdapterGrid mAdapter;
     private RecyclerView mList;
 
-
+    private static String language;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,10 +69,13 @@ public class SerieGridActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mNavItems.add(new NavItem("Movies", "List the movies", R.drawable.heart01));
-        mNavItems.add(new NavItem("Tv shows", "List the tv shows", R.drawable.tv_shows));
-        mNavItems.add(new NavItem("Settings", "Change your settings", R.drawable.ic_settings_black_24dp));
-        mNavItems.add(new NavItem("Favourites", "List your favourites", R.drawable.heart01));
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
+        language = pref.getString("lang", null);
+
+        mNavItems.add(new NavItem(getResources().getString(R.string.movies), getResources().getString(R.string.movies_des), R.drawable.movies));
+        mNavItems.add(new NavItem(getResources().getString(R.string.tvshow), getResources().getString(R.string.tvshow_des), R.drawable.tv_shows));
+        mNavItems.add(new NavItem(getResources().getString(R.string.settings), getResources().getString(R.string.settings_des), R.drawable.ic_settings_black_24dp));
+        mNavItems.add(new NavItem(getResources().getString(R.string.favorites), getResources().getString(R.string.favorites_des  ), R.drawable.heart01));
 
         // DrawerLayout
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -93,15 +97,27 @@ public class SerieGridActivity extends AppCompatActivity {
                  */
                 setTitle(mNavItems.get(position).mTitle);
                 Toast.makeText(mContext, "You clicked on " + mNavItems.get(position).mTitle, Toast.LENGTH_SHORT).show();
-                if(mNavItems.get(position).mTitle == "Movies"){
+                if(mNavItems.get(position).mTitle == getResources().getString(R.string.movies)){
                     Intent intentMain = new Intent(SerieGridActivity.this ,
                             MovieListActivity.class);
                     SerieGridActivity.this.startActivity(intentMain);
                     Log.i("Content "," Main layout ");
                 }
-                if(mNavItems.get(position).mTitle == "Tv shows"){
+                if(mNavItems.get(position).mTitle == getResources().getString(R.string.tvshow)){
                     Intent intentMain = new Intent(SerieGridActivity.this ,
                             SerieListActivity.class);
+                    SerieGridActivity.this.startActivity(intentMain);
+                    Log.i("Content "," Main layout ");
+                }
+                if(mNavItems.get(position).mTitle == getResources().getString(R.string.settings)){
+                    Intent intentMain = new Intent(SerieGridActivity.this ,
+                            SettingsActivity.class);
+                    SerieGridActivity.this.startActivity(intentMain);
+                    Log.i("Content "," Main layout ");
+                }
+                if(mNavItems.get(position).mTitle == getResources().getString(R.string.favorites)){
+                    Intent intentMain = new Intent(SerieGridActivity.this ,
+                            FavouriteListActivity.class);
                     SerieGridActivity.this.startActivity(intentMain);
                     Log.i("Content "," Main layout ");
                 }
@@ -159,7 +175,7 @@ public class SerieGridActivity extends AppCompatActivity {
         ApiService apiservice =  restAdapter.create(ApiService.class);
 
         // Execute the call asynchronously. Get a positive or negative callback.
-        apiservice.getPopularSeries(API_KEY).enqueue(new Callback<Series>() {
+        apiservice.getPopularSeries(API_KEY, language).enqueue(new Callback<Series>() {
             @Override
             public void onResponse(Call<Series> call, Response<Series> response) {
                 // The network call was a success and we got a response

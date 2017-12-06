@@ -66,10 +66,10 @@ public class FavouriteListActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mNavItems.add(new NavItem("Movies", "List the movies", movies));
-        mNavItems.add(new NavItem("Tv shows", "List the tv shows", R.drawable.tv_shows));
-        mNavItems.add(new NavItem("Settings", "Change your settings", R.drawable.ic_settings_black_24dp));
-        mNavItems.add(new NavItem("Favourites", "List your favourites", R.drawable.heart01));
+        mNavItems.add(new NavItem(getResources().getString(R.string.movies), getResources().getString(R.string.movies_des), R.drawable.movies));
+        mNavItems.add(new NavItem(getResources().getString(R.string.tvshow), getResources().getString(R.string.tvshow_des), R.drawable.tv_shows));
+        mNavItems.add(new NavItem(getResources().getString(R.string.settings), getResources().getString(R.string.settings_des), R.drawable.ic_settings_black_24dp));
+        mNavItems.add(new NavItem(getResources().getString(R.string.favorites), getResources().getString(R.string.favorites_des  ), R.drawable.heart01));
 
         // DrawerLayout
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -91,15 +91,27 @@ public class FavouriteListActivity extends AppCompatActivity {
                  */
                 setTitle(mNavItems.get(position).mTitle);
                 Toast.makeText(mContext, "You clicked on " + mNavItems.get(position).mTitle, Toast.LENGTH_SHORT).show();
-                if(mNavItems.get(position).mTitle == "Movies"){
+                if(mNavItems.get(position).mTitle == getResources().getString(R.string.movies)){
                     Intent intentMain = new Intent(FavouriteListActivity.this ,
-                            FavouriteListActivity.class);
+                            MovieListActivity.class);
                     FavouriteListActivity.this.startActivity(intentMain);
                     Log.i("Content "," Main layout ");
                 }
-                if(mNavItems.get(position).mTitle == "Tv shows"){
+                if(mNavItems.get(position).mTitle == getResources().getString(R.string.tvshow)){
                     Intent intentMain = new Intent(FavouriteListActivity.this ,
                             SerieListActivity.class);
+                    FavouriteListActivity.this.startActivity(intentMain);
+                    Log.i("Content "," Main layout ");
+                }
+                if(mNavItems.get(position).mTitle == getResources().getString(R.string.settings)){
+                    Intent intentMain = new Intent(FavouriteListActivity.this ,
+                            SettingsActivity.class);
+                    FavouriteListActivity.this.startActivity(intentMain);
+                    Log.i("Content "," Main layout ");
+                }
+                if(mNavItems.get(position).mTitle == getResources().getString(R.string.favorites)){
+                    Intent intentMain = new Intent(FavouriteListActivity.this ,
+                            FavouriteListActivity.class);
                     FavouriteListActivity.this.startActivity(intentMain);
                     Log.i("Content "," Main layout ");
                 }
@@ -117,9 +129,9 @@ public class FavouriteListActivity extends AppCompatActivity {
             Movie m = new Movie();
             m.setId(res.getInt(0));
             m.setTitle(res.getString(1));
-            m.setOverview(res.getString(0));
-            m.setPosterPath(res.getString(0));
-            m.setVoteAverage(res.getDouble(0));
+            m.setOverview(res.getString(2));
+            m.setPosterPath(res.getString(3));
+            m.setVoteAverage(res.getDouble(4));
 
             listMovies.add(m);
         }

@@ -2,6 +2,7 @@ package com.example.lenovo.tmbd_safwane;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -59,6 +60,7 @@ public class MovieGridActivity extends AppCompatActivity {
     private MovieAdapterGrid mAdapter;
     private RecyclerView mList;
 
+    private static  String language;
 
 
     @Override
@@ -68,10 +70,13 @@ public class MovieGridActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mNavItems.add(new NavItem("Movies", "List the movies", R.drawable.heart01));
-        mNavItems.add(new NavItem("Tv shows", "List the tv shows", R.drawable.tv_shows));
-        mNavItems.add(new NavItem("Settings", "Change your settings", R.drawable.ic_settings_black_24dp));
-        mNavItems.add(new NavItem("Favourites", "List your favourites", R.drawable.heart01));
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
+        language = pref.getString("lang", null);
+
+        mNavItems.add(new NavItem(getResources().getString(R.string.movies), getResources().getString(R.string.movies_des), R.drawable.movies));
+        mNavItems.add(new NavItem(getResources().getString(R.string.tvshow), getResources().getString(R.string.tvshow_des), R.drawable.tv_shows));
+        mNavItems.add(new NavItem(getResources().getString(R.string.settings), getResources().getString(R.string.settings_des), R.drawable.ic_settings_black_24dp));
+        mNavItems.add(new NavItem(getResources().getString(R.string.favorites), getResources().getString(R.string.favorites_des  ), R.drawable.heart01));
 
         // DrawerLayout
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -93,15 +98,27 @@ public class MovieGridActivity extends AppCompatActivity {
                  */
                 setTitle(mNavItems.get(position).mTitle);
                 Toast.makeText(mContext, "You clicked on " + mNavItems.get(position).mTitle, Toast.LENGTH_SHORT).show();
-                if(mNavItems.get(position).mTitle == "Movies"){
+                if(mNavItems.get(position).mTitle == getResources().getString(R.string.movies)){
                     Intent intentMain = new Intent(MovieGridActivity.this ,
                             MovieListActivity.class);
                     MovieGridActivity.this.startActivity(intentMain);
                     Log.i("Content "," Main layout ");
                 }
-                if(mNavItems.get(position).mTitle == "Tv shows"){
+                if(mNavItems.get(position).mTitle == getResources().getString(R.string.tvshow)){
                     Intent intentMain = new Intent(MovieGridActivity.this ,
                             SerieListActivity.class);
+                    MovieGridActivity.this.startActivity(intentMain);
+                    Log.i("Content "," Main layout ");
+                }
+                if(mNavItems.get(position).mTitle == getResources().getString(R.string.settings)){
+                    Intent intentMain = new Intent(MovieGridActivity.this ,
+                            SettingsActivity.class);
+                    MovieGridActivity.this.startActivity(intentMain);
+                    Log.i("Content "," Main layout ");
+                }
+                if(mNavItems.get(position).mTitle == getResources().getString(R.string.favorites)){
+                    Intent intentMain = new Intent(MovieGridActivity.this ,
+                            FavouriteListActivity.class);
                     MovieGridActivity.this.startActivity(intentMain);
                     Log.i("Content "," Main layout ");
                 }
@@ -158,11 +175,8 @@ public class MovieGridActivity extends AppCompatActivity {
         // Create a very simple REST adapter which points TMDB API endpoint.
         ApiService apiservice =  restAdapter.create(ApiService.class);
 
-        // Fetch a list of the popular movies.
-        //Call<List<Movie>> call = apiservice.getPopularMovies(API_KEY);
-
         // Execute the call asynchronously. Get a positive or negative callback.
-        apiservice.getPopularMovies(API_KEY).enqueue(new Callback<Movies>() {
+        apiservice.getPopularMovies(API_KEY, language).enqueue(new Callback<Movies>() {
             @Override
             public void onResponse(Call<Movies> call, Response<Movies> response) {
                 // The network call was a success and we got a response
@@ -187,9 +201,6 @@ public class MovieGridActivity extends AppCompatActivity {
 
                 GridLayoutManager layoutManager = new GridLayoutManager(context, 3);
                 mList.setLayoutManager(layoutManager);
-
-
-                //String listeName[] = {"chaine1", "chaine2", "chaine3", "chaine4", "chaine5", "chaine6", "chaine7", "chaine8", "chaine9", "chaine10"};
 
                 mAdapter = new MovieAdapterGrid(listMovies, getApplicationContext());
 

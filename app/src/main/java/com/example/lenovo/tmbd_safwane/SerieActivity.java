@@ -2,6 +2,7 @@ package com.example.lenovo.tmbd_safwane;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -15,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -27,8 +27,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-import static com.example.lenovo.tmbd_safwane.R.drawable.movies;
-
 /**
  * Created by Lenovo on 26/11/2017.
  */
@@ -37,6 +35,8 @@ public class SerieActivity extends AppCompatActivity {
     private static String TAG = SerieActivity.class.getSimpleName();
 
     Context context = this;
+
+    private DBHelper db;
 
     //Drawer list attributes
     ListView mDrawerList;
@@ -48,22 +48,24 @@ public class SerieActivity extends AppCompatActivity {
     ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
 
     private Serie serie;
+    private boolean mInserted;
+    private boolean isFavourite;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_movie);
+        setContentView(R.layout.activity_movie);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar2);
         setSupportActionBar(toolbar);
 
-        ImageButton addFavButton =  (ImageButton)findViewById(R.id.favorite_border);
-        setTitle("Movie details");
+        setTitle(R.string.serie_details);
+        db = new DBHelper(this);
 
-        mNavItems.add(new NavItem("Movies", "List the movies", movies));
-        mNavItems.add(new NavItem("Tv shows", "List the tv shows", R.drawable.tv_shows));
-        mNavItems.add(new NavItem("Settings", "Change your settings", R.drawable.ic_settings_black_24dp));
-        mNavItems.add(new NavItem("Favourites", "List your favourites", R.drawable.heart01));
+        mNavItems.add(new NavItem(getResources().getString(R.string.movies), getResources().getString(R.string.movies_des), R.drawable.movies));
+        mNavItems.add(new NavItem(getResources().getString(R.string.tvshow), getResources().getString(R.string.tvshow_des), R.drawable.tv_shows));
+        mNavItems.add(new NavItem(getResources().getString(R.string.settings), getResources().getString(R.string.settings_des), R.drawable.ic_settings_black_24dp));
+        mNavItems.add(new NavItem(getResources().getString(R.string.favorites), getResources().getString(R.string.favorites_des  ), R.drawable.heart01));
 
         // DrawerLayout
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -85,17 +87,29 @@ public class SerieActivity extends AppCompatActivity {
                  */
                 setTitle(mNavItems.get(position).mTitle);
                 Toast.makeText(mContext, "You clicked on " + mNavItems.get(position).mTitle, Toast.LENGTH_SHORT).show();
-                if(mNavItems.get(position).mTitle == "Movies"){
+                if(mNavItems.get(position).mTitle == getResources().getString(R.string.movies)){
                     Intent intentMain = new Intent(SerieActivity.this ,
                             MovieListActivity.class);
                     SerieActivity.this.startActivity(intentMain);
-                    Log.i("Content "," Movie layout ");
+                    Log.i("Content "," Main layout ");
                 }
-                if(mNavItems.get(position).mTitle == "Tv shows"){
+                if(mNavItems.get(position).mTitle == getResources().getString(R.string.tvshow)){
                     Intent intentMain = new Intent(SerieActivity.this ,
                             SerieListActivity.class);
                     SerieActivity.this.startActivity(intentMain);
-                    Log.i("Content "," Serie layout ");
+                    Log.i("Content "," Main layout ");
+                }
+                if(mNavItems.get(position).mTitle == getResources().getString(R.string.settings)){
+                    Intent intentMain = new Intent(SerieActivity.this ,
+                            SettingsActivity.class);
+                    SerieActivity.this.startActivity(intentMain);
+                    Log.i("Content "," Main layout ");
+                }
+                if(mNavItems.get(position).mTitle == getResources().getString(R.string.favorites)){
+                    Intent intentMain = new Intent(SerieActivity.this ,
+                            FavouriteListActivity.class);
+                    SerieActivity.this.startActivity(intentMain);
+                    Log.i("Content "," Main layout ");
                 }
             }
         });
@@ -112,24 +126,22 @@ public class SerieActivity extends AppCompatActivity {
         overview.setText(serie.getOverview());
         popularity.setText(Double.toString(serie.getVoteAverage()));
 
-        Picasso
-                .with(context)
-                .load("http://image.tmdb.org/t/p/w500"+serie.getBackdropPath())
-                .into(poster);
+        if(serie.getBackdropPath() != null){
+            Picasso
+                    .with(context)
+                    .load("http://image.tmdb.org/t/p/w500"+serie.getBackdropPath())
+                    .into(poster);
+        }
+        else{
+            Picasso
+                    .with(context)
+                    .load("http://image.tmdb.org/t/p/w500"+serie.getPosterPath())
+                    .into(poster);
+        }
 
-        addFavButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                //boolean inserted = db.insert(movie.getId(), movie.getTitle(), movie.getOverview(), movie.getPosterPath(),   movie.getVoteAverage());
-                //if(inserted) {
-                Toast.makeText(mContext, "Added to favorites", Toast.LENGTH_LONG);
-                //}else{
-                Toast.makeText(mContext, "Error adding to favourites", Toast.LENGTH_LONG);
-                //}
-                Toast.makeText(mContext, "Added to favorites", Toast.LENGTH_LONG);
-                Toast.makeText(mContext, "Error adding to favourites", Toast.LENGTH_LONG);
-            }
-        });
+        Cursor cursor = db.getFavoritesById(serie.getId());
+        isFavourite = cursor.getCount() != 0;
+
 
     }
 
@@ -137,6 +149,12 @@ public class SerieActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_both, menu);
+        if(!isFavourite){
+            menu.findItem(R.id.action_favourite).setIcon(R.mipmap.ic_favorite_border);
+        }
+        if(isFavourite){
+            menu.findItem(R.id.action_favourite).setIcon(R.drawable.ic_favorite_filled);
+        }
         return true;
     }
 
@@ -160,6 +178,35 @@ public class SerieActivity extends AppCompatActivity {
                     SerieListActivity.class);
             SerieActivity.this.startActivity(intentMain);
             Log.i("Content "," Main layout ");
+        }
+        if (id == R.id.action_share) {
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            String shareBody = getString(R.string.action_share_msg) + " " + serie.getName();
+            shareIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.action_share)));
+        }
+        if (id == R.id.action_favourite) {
+            if(!isFavourite){
+                mInserted = db.insert(serie.getId(), serie.getName(), serie.getOverview(), serie.getPosterPath(),   serie.getVoteAverage());
+                if(mInserted) {
+                    setTitle("Favorite");
+                    item.setIcon(R.drawable.ic_favorite_filled);
+                    isFavourite = true;
+                }else{
+                    setTitle("Already favorite");
+                    item.setIcon(R.drawable.ic_favorite_filled);
+                }
+                //Toast.makeText(mContext, "Error adding to favourites", Toast.LENGTH_LONG);
+            }
+            else{
+                Integer deletedRows = db.delete(serie.getId());
+                if(deletedRows > 0){
+                    setTitle("No longer favorite");
+                    item.setIcon(R.mipmap.ic_favorite_border);
+                    isFavourite = false;
+                }
+            }
         }
 
         return super.onOptionsItemSelected(item);
