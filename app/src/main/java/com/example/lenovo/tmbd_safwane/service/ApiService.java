@@ -1,6 +1,5 @@
 package com.example.lenovo.tmbd_safwane.service;
 
-import com.example.lenovo.tmbd_safwane.models.Movie;
 import com.example.lenovo.tmbd_safwane.models.Movies;
 import com.example.lenovo.tmbd_safwane.models.Series;
 
@@ -20,5 +19,15 @@ public interface ApiService {
     @GET("tv/popular")
     Call<Series> getPopularSeries(@Query("api_key") String apiKey,
                                   @Query("language") String language);
+
+    @GET("search/movie")
+    Call<Movies> searchMovie(@Query("query") String query,
+                             @Query("api_key") String apiKey,
+                             @Query("language") String language);
+
+    @GET("search/tv")
+    Call<Series> searchSerie(@Query("query") String query,
+                             @Query("api_key") String apiKey,
+                             @Query("language") String language);
 
 }

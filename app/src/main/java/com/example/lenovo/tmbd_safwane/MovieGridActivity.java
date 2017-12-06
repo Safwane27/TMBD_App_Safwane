@@ -8,6 +8,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -27,6 +28,7 @@ import android.widget.Toast;
 import com.example.lenovo.tmbd_safwane.models.Movie;
 import com.example.lenovo.tmbd_safwane.models.Movies;
 import com.example.lenovo.tmbd_safwane.service.ApiService;
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -62,6 +64,8 @@ public class MovieGridActivity extends AppCompatActivity {
 
     private static  String language;
 
+    MaterialSearchView searchView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +73,8 @@ public class MovieGridActivity extends AppCompatActivity {
         setContentView(R.layout.activity_movie_grid);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        searchView = (MaterialSearchView) findViewById(R.id.search);
 
         SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
         language = pref.getString("lang", null);
@@ -125,6 +131,32 @@ public class MovieGridActivity extends AppCompatActivity {
             }
         });
 
+        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchMovie(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                //Do some magic
+                return false;
+            }
+        });
+
+        searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+            @Override
+            public void onSearchViewShown() {
+                //Do some magic
+            }
+
+            @Override
+            public void onSearchViewClosed() {
+                //Do some magic
+            }
+        });
+
         try {
             retrofitMethod();
         } catch (IOException e) {
@@ -138,6 +170,10 @@ public class MovieGridActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_grid, menu);
+
+        MenuItem item = menu.findItem(R.id.search);
+        searchView.setMenuItem(item);
+
         return true;
     }
 
@@ -206,6 +242,57 @@ public class MovieGridActivity extends AppCompatActivity {
 
                 mList.setAdapter(mAdapter);
                 // TODO: use the repository list and display it
+            }
+
+            @Override
+            public void onFailure(Call<Movies> call, Throwable t) {
+                // the network call was a failure
+                Toast.makeText(MovieGridActivity.this, "Could not retrieve data, check connection", Toast.LENGTH_SHORT).show();
+                // TODO: handle error
+            }
+        });
+    }
+
+    public void searchMovie(final String title) {
+
+        final List<Movie> listMovies = new ArrayList<>();
+
+        Retrofit restAdapter =
+                new Retrofit.Builder()
+                        .baseUrl(API_BASE)
+                        .addConverterFactory(
+                                GsonConverterFactory.create()
+                        ).build();
+
+
+        // Create a very simple REST adapter which points TMDB API endpoint.
+        ApiService apiservice =  restAdapter.create(ApiService.class);
+
+        apiservice.searchMovie(title, API_KEY, language).enqueue(new Callback<Movies>() {
+            @Override
+            public void onResponse(Call<Movies> call, Response<Movies> response) {
+                // The network call was a success and we got a response
+
+                Movies movies = response.body();
+                if (movies != null) {
+                    for (Movie movie : movies.getResults()) {
+                        if (movie.getTitle().equalsIgnoreCase(title) || movie.getTitle().toLowerCase().contains(title.toLowerCase())){
+                            listMovies.add(movie);
+                        }
+                    }
+                }
+                else{
+                    startActivity(new Intent(MovieGridActivity.this, MovieGridActivity.class));
+                }
+
+                mList = (RecyclerView) findViewById(R.id.rv);
+
+                GridLayoutManager layoutManager = new GridLayoutManager(context, 3);
+                mList.setLayoutManager(layoutManager);
+
+                mAdapter = new MovieAdapterGrid(listMovies, getApplicationContext());
+
+                mList.setAdapter(mAdapter);
             }
 
             @Override

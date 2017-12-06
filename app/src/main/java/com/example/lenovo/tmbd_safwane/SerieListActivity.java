@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.example.lenovo.tmbd_safwane.models.Serie;
 import com.example.lenovo.tmbd_safwane.models.Series;
 import com.example.lenovo.tmbd_safwane.service.ApiService;
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -62,6 +63,8 @@ public class SerieListActivity extends AppCompatActivity {
 
     private static String language;
 
+    MaterialSearchView searchView;
+
 
 
     @Override
@@ -70,6 +73,8 @@ public class SerieListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_movie_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        searchView = (MaterialSearchView) findViewById(R.id.search);
 
         SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
         language = pref.getString("lang", null);
@@ -126,6 +131,32 @@ public class SerieListActivity extends AppCompatActivity {
             }
         });
 
+        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchSerie(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                //Do some magic
+                return false;
+            }
+        });
+
+        searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+            @Override
+            public void onSearchViewShown() {
+                //Do some magic
+            }
+
+            @Override
+            public void onSearchViewClosed() {
+                //Do some magic
+            }
+        });
+
         try {
             retrofitMethod();
         } catch (IOException e) {
@@ -139,6 +170,10 @@ public class SerieListActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        MenuItem item = menu.findItem(R.id.search);
+        searchView.setMenuItem(item);
+
         return true;
     }
 
@@ -207,6 +242,57 @@ public class SerieListActivity extends AppCompatActivity {
 
                 mList.setAdapter(mAdapter);
                 // TODO: use the repository list and display it
+            }
+
+            @Override
+            public void onFailure(Call<Series> call, Throwable t) {
+                // the network call was a failure
+                Toast.makeText(SerieListActivity.this, "Could not retrieve data, check connection", Toast.LENGTH_SHORT).show();
+                // TODO: handle error
+            }
+        });
+    }
+
+    public void searchSerie(final String title) {
+
+        final List<Serie> listSeries = new ArrayList<>();
+
+        Retrofit restAdapter =
+                new Retrofit.Builder()
+                        .baseUrl(API_BASE)
+                        .addConverterFactory(
+                                GsonConverterFactory.create()
+                        ).build();
+
+
+        // Create a very simple REST adapter which points TMDB API endpoint.
+        ApiService apiservice =  restAdapter.create(ApiService.class);
+
+        apiservice.searchSerie(title, API_KEY, language).enqueue(new Callback<Series>() {
+            @Override
+            public void onResponse(Call<Series> call, Response<Series> response) {
+                // The network call was a success and we got a response
+
+                Series movies = response.body();
+                if (movies != null) {
+                    for (Serie movie : movies.getResults()) {
+                        if (movie.getName().equalsIgnoreCase(title) || movie.getName().toLowerCase().contains(title.toLowerCase())){
+                            listSeries.add(movie);
+                        }
+                    }
+                }
+                else{
+                    startActivity(new Intent(SerieListActivity.this, SerieListActivity.class));
+                }
+
+                mList = (RecyclerView) findViewById(R.id.rv);
+
+                LinearLayoutManager layoutManager = new LinearLayoutManager(context);
+                mList.setLayoutManager(layoutManager);
+
+                mAdapter = new SerieAdapter(listSeries, getApplicationContext());
+
+                mList.setAdapter(mAdapter);
             }
 
             @Override

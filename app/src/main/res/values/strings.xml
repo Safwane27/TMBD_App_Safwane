@@ -4,6 +4,8 @@
     <string name="action_grid">Grid Layout</string>
     <string name="action_list">List Layout</string>
     <string name="action_share">Share</string>
+    <string name="search_title">Search</string>
+    <string name="search_hint">Search by title</string>
     <string name="action_share_msg">I want to share this movie with you : </string>
     <string name="action_favourite">Add to favourites</string>
     <string name="movies">Movies</string>

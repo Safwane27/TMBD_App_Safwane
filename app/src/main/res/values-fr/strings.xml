@@ -22,4 +22,6 @@
     <string name="movie_details">Détails du film</string>
     <string name="action_share">Partager</string>
     <string name="action_share_msg">Je veux partager ce film avec toi</string>
+    <string name="search_title">Rechercher</string>
+    <string name="search_hint">Rechercher par titre</string>
 </resources>
